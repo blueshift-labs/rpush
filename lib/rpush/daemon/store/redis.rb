@@ -108,10 +108,9 @@ module Rpush
 
         def pending_delivery_count
           Modis.with_connection do |redis|
-            pending = redis.zrange(Rpush::Client::Redis::Notification.absolute_pending_namespace, 0, -1)
-            retryable = redis.zrangebyscore(Rpush::Client::Redis::Notification.absolute_retryable_namespace, 0, Time.now.to_i)
-
-            pending.count + retryable.count
+            pending = redis.zcard(Rpush::Client::Redis::Notification.absolute_pending_namespace)
+            retryable = redis.zcard(Rpush::Client::Redis::Notification.absolute_retryable_namespace)
+            pending + retryable
           end
         end
 
@@ -135,13 +134,16 @@ module Rpush
           retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
 
           Modis.with_connection do |redis|
-            retryable_results = redis.multi do
-              now = Time.now.to_i
-              redis.zrangebyscore(retryable_ns, 0, now)
-              redis.zremrangebyscore(retryable_ns, 0, now)
+            now = Time.now.to_i
+            if Modis.cluster_mode?
+              retryable_results = redis.zrangebyscorethenrem(retryable_ns, 0, now)
+            else
+              retryable_results = redis.multi do
+                redis.zrangebyscore(retryable_ns, 0, now)
+                redis.zremrangebyscore(retryable_ns, 0, now)
+              end
+              retryable_results.first
             end
-
-            retryable_results.first
           end
         end
 
@@ -150,12 +152,16 @@ module Rpush
           pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
 
           Modis.with_connection do |redis|
-            pending_results = redis.multi do
-              redis.zrange(pending_ns, 0, limit)
-              redis.zremrangebyrank(pending_ns, 0, limit)
-            end
+            if Modis.cluster_mode?
+              pending_results = redis.zrangethenrem(pending_ns, 0, limit)
+            else
+              pending_results = redis.multi do
+                redis.zrange(pending_ns, 0, limit)
+                redis.zremrangebyrank(pending_ns, 0, limit)
+              end
 
-            pending_results.first
+              pending_results.first
+            end
           end
         end
       end
