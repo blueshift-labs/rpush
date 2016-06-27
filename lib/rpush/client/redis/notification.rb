@@ -58,6 +58,13 @@ module Rpush
         attribute :dry_run, :boolean
 
 
+        # Blueshift specific attributes
+        attribute :experiment_uuid, :string
+        attribute :user_uuid, :string
+        attribute :execution_key, :string
+        attribute :retailer_customer_id, :string
+
+
         def app
           return nil unless app_id
           @app ||= Rpush::Client::Redis::App.find(app_id)
