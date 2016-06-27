@@ -46,6 +46,13 @@ module Rpush
         attribute :mutable_content, :boolean, default: false
         attribute :notification, :hash
 
+        # Blueshift specific attributes
+        attribute :experiment_uuid, :string
+        attribute :user_uuid, :string
+        attribute :execution_key, :string
+        attribute :retailer_customer_id, :string
+
+
         def app
           return nil unless app_id
           @app ||= Rpush::Client::Redis::App.find(app_id)
@@ -64,7 +71,7 @@ module Rpush
 
         def register_notification
           Modis.with_connection do |redis|
-            redis.zadd(self.class.absolute_pending_namespace, id, id)
+            redis.zadd(Rpush::Client::Redis::Notification.absolute_pending_namespace, id, id)
           end
         end
       end

@@ -100,10 +100,20 @@ module Rpush
         end
 
         def create_new_notification(response, unavailable_idxs)
-          attrs = { 'app_id' => @notification.app_id, 'collapse_key' => @notification.collapse_key, 'delay_while_idle' => @notification.delay_while_idle }
+          attrs = {
+            'app_id' => @notification.app_id,
+            'collapse_key' => @notification.collapse_key,
+            'delay_while_idle' => @notification.delay_while_idle,
+            'user_uuid' => @notification.user_uuid,
+            'experiment_uuid' => @notification.experiment_uuid,
+            'execution_key' => @notification.execution_key
+          }
+          if @notification.retailer_customer_id.present?
+            attrs['retailer_customer_id'] = @notification.retailer_customer_id
+          end
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
-          Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
-                                                      registration_ids, deliver_after_header(response), @notification.app)
+          Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data, registration_ids,
+            deliver_after_header(response), @notification.app)
         end
 
         def bad_request
