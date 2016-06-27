@@ -3,6 +3,7 @@
 begin
   require 'modis'
   require 'redis'
+  require 'rediscluster'
 rescue LoadError
   puts
   str = "* Please add 'rpush-redis' to your Gemfile to use the Redis client. *"
