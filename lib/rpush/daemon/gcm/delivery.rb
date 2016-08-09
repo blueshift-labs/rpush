@@ -106,7 +106,8 @@ module Rpush
             'delay_while_idle' => @notification.delay_while_idle,
             'user_uuid' => @notification.user_uuid,
             'experiment_uuid' => @notification.experiment_uuid,
-            'execution_key' => @notification.execution_key
+            'execution_key' => @notification.execution_key,
+            'dry_run' => @notification.dry_run
           }
           if @notification.retailer_customer_id.present?
             attrs['retailer_customer_id'] = @notification.retailer_customer_id
