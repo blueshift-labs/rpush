@@ -50,6 +50,7 @@ module Rpush
         attribute :user_uuid, :string
         attribute :execution_key, :string
         attribute :retailer_customer_id, :string
+        attribute :dry_run, :boolean
 
 
         def app
