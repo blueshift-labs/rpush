@@ -17,7 +17,7 @@ module Rpush
           limit -= retryable_ids.size
           pending_ids = limit > 0 ? pending_notification_ids(limit) : []
           ids = retryable_ids + pending_ids
-          ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
+          ids.map { |id| Rpush::Client::Redis::Notification.find(id) rescue nil }.compact
         end
 
         def mark_delivered(notification, time, opts = {})
