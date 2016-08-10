@@ -160,7 +160,7 @@ module Rpush
 
         def do_post
           post = Net::HTTP::Post.new(FCM_URI.path, 'Content-Type'  => 'application/json',
-                                                   'Authorization' => "key=#{@notification.app.auth_key}")
+            'Authorization' => "key=#{@notification.app.auth_key}")
           payload = @notification.as_json
           if @notification.dry_run
             payload["dry_run"] = true
