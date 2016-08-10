@@ -166,8 +166,6 @@ module Rpush
             payload["dry_run"] = true
           end
           post.body = payload.to_json
-
-
           @http.request(FCM_URI, post)
         end
       end
