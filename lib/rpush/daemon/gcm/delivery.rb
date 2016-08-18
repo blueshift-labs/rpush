@@ -71,7 +71,8 @@ module Rpush
           successes.each do |result|
             reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
             next unless result.key?(:canonical_id)
-            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
+            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id], @notification.user_uuid,
+              @notification.app_id)
           end
         end
 
@@ -95,7 +96,7 @@ module Rpush
             reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
           end
           failures[:invalid].each do |result|
-            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id])
+            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id], @notification.user_uuid)
           end
         end
 
