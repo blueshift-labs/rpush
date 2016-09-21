@@ -48,13 +48,13 @@ module Rpush
         attribute :mutable_content, :boolean, default: false
         attribute :notification, :hash
         attribute :thread_id, :string
+        attribute :device_id, :string
 
         # Blueshift specific attributes
         attribute :experiment_uuid, :string
         attribute :user_uuid, :string
         attribute :execution_key, :string
         attribute :retailer_customer_id, :string
-        attribute :dry_run, :boolean
 
 
         def app
