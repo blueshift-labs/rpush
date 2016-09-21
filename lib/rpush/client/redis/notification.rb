@@ -48,6 +48,7 @@ module Rpush
         attribute :mutable_content, :boolean, default: false
         attribute :notification, :hash
         attribute :thread_id, :string
+        attribute :device_id, :string
 
         # Blueshift specific attributes
         attribute :experiment_uuid, :string
