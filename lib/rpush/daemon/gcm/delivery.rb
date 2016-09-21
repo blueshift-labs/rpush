@@ -71,8 +71,8 @@ module Rpush
           successes.each do |result|
             reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
             next unless result.key?(:canonical_id)
-            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id], @notification.user_uuid,
-              @notification.app_id)
+            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id],
+              @notification.device_id, @notification.user_uuid, @notification.app_id)
           end
         end
 
@@ -93,10 +93,12 @@ module Rpush
 
         def handle_errors(failures)
           failures.each do |result|
-            reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
+            reflect(:gcm_failed_to_recipient, @notification, result[:error],
+              result[:registration_id])
           end
           failures[:invalid].each do |result|
-            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id], @notification.user_uuid)
+            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id],
+              @notification.device_id, @notification.user_uuid)
           end
         end
 
@@ -112,6 +114,9 @@ module Rpush
           }
           if @notification.retailer_customer_id.present?
             attrs['retailer_customer_id'] = @notification.retailer_customer_id
+          end
+          if @notification.device_id.present?
+            attrs['device_id'] = @notification.device_id
           end
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
           Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
