@@ -55,7 +55,7 @@ module Rpush
         attribute :user_uuid, :string
         attribute :execution_key, :string
         attribute :retailer_customer_id, :string
-
+        attribute :queue_to_front, :boolean, default: false
 
         def app
           return nil unless app_id
@@ -75,7 +75,8 @@ module Rpush
 
         def register_notification
           Modis.with_connection do |redis|
-            redis.zadd(Rpush::Client::Redis::Notification.absolute_pending_namespace, id, id)
+            score = queue_to_front ? 0 : id
+            redis.zadd(Rpush::Client::Redis::Notification.absolute_pending_namespace, score, id)
           end
         end
       end
