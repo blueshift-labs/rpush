@@ -110,7 +110,8 @@ module Rpush
             'user_uuid' => @notification.user_uuid,
             'experiment_uuid' => @notification.experiment_uuid,
             'execution_key' => @notification.execution_key,
-            'dry_run' => @notification.dry_run
+            'dry_run' => @notification.dry_run,
+            'seed_list_send' => @notification.seed_list_send
           }
           if @notification.retailer_customer_id.present?
             attrs['retailer_customer_id'] = @notification.retailer_customer_id
