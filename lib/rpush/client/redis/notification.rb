@@ -56,6 +56,7 @@ module Rpush
         attribute :execution_key, :string
         attribute :retailer_customer_id, :string
         attribute :queue_to_front, :boolean, default: false
+        attribute :seed_list_send, :boolean, default: false
 
         def app
           return nil unless app_id
