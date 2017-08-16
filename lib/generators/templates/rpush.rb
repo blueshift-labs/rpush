@@ -93,12 +93,12 @@ Rpush.reflect do |on|
 
   # Called when the GCM returns a canonical registration ID.
   # You will need to replace old_id with canonical_id in your records.
-  # on.gcm_canonical_id do |old_id, canonical_id|
+  # on.gcm_canonical_id do |old_id, canonical_id, notification|
   # end
 
   # Called when the GCM returns a failure that indicates an invalid registration id.
   # You will need to delete the registration_id from your records.
-  # on.gcm_invalid_registration_id do |app, error, registration_id|
+  # on.gcm_invalid_registration_id do |app, error, registration_id, notification|
   # end
 
   # Called when an SSL certificate will expire within 1 month.
