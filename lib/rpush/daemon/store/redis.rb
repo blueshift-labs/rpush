@@ -120,6 +120,56 @@ module Rpush
 
         private
 
+        ZRANGEBYSCORETHENREM_SCRIPT = <<-EOS
+          -- Redis lua script
+          local queue_key = KEYS[1]
+          local min = ARGV[1]
+          local max = ARGV[2]
+          local return_results = redis.call('zrangebyscore', queue_key, min, max)
+          redis.call('zremrangebyscore', queue_key, min, max)
+
+          return return_results
+        EOS
+
+        ZRANGEBYSCORETHENREM_SCRIPT_HASH = Digest::SHA1.hexdigest(ZRANGEBYSCORETHENREM_SCRIPT)
+
+        def zrangebyscorethenrem(key, min, max)
+          keys = [key]
+          args = [min, max]
+          result = nil
+          begin
+            result = redis.evalsha(ZRANGEBYSCORETHENREM_SCRIPT_HASH, keys: keys, argv: args)
+          rescue Redis::CommandError => e
+            result = redis.eval(ZRANGEBYSCORETHENREM_SCRIPT, keys: keys, argv: args)
+          end
+          result
+        end
+
+        ZRANGETHENREM_SCRIPT = <<-EOS
+          -- Redis lua script
+          local queue_key = KEYS[1]
+          local start = ARGV[1]
+          local stop = ARGV[2]
+          local return_results = redis.call('zrange', queue_key, start, stop)
+          redis.call('zremrangebyrank', queue_key, start, stop)
+
+          return return_results
+        EOS
+
+        ZRANGETHENREM_SCRIPT_HASH = Digest::SHA1.hexdigest(ZRANGETHENREM_SCRIPT)
+
+        def zrangethenrem(key, start, stop)
+          keys = [key]
+          args = [start, stop]
+          result = nil
+          begin
+            result = redis.evalsha(ZRANGETHENREM_SCRIPT_HASH, keys: keys, argv: args)
+          rescue Redis::CommandError => e
+            result = redis.eval(ZRANGETHENREM_SCRIPT, keys: keys, argv: args)
+          end
+          result
+        end
+
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
           notification.assign_attributes(attrs)
           notification.data = data
@@ -136,7 +186,7 @@ module Rpush
           Modis.with_connection do |redis|
             now = Time.now.to_i
             if Modis.cluster_mode?
-              retryable_results = redis.zrangebyscorethenrem(retryable_ns, 0, now)
+              retryable_results = zrangebyscorethenrem(retryable_ns, 0, now)
             else
               retryable_results = redis.multi do
                 redis.zrangebyscore(retryable_ns, 0, now)
@@ -153,7 +203,7 @@ module Rpush
 
           Modis.with_connection do |redis|
             if Modis.cluster_mode?
-              pending_results = redis.zrangethenrem(pending_ns, 0, limit)
+              pending_results = zrangethenrem(pending_ns, 0, limit)
             else
               pending_results = redis.multi do
                 redis.zrange(pending_ns, 0, limit)
