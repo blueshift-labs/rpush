@@ -142,8 +142,8 @@ module Rpush
           local queue_key = KEYS[1]
           local min = ARGV[1]
           local max = ARGV[2]
-          redis.call('zrangebyscore', queue_key, min, max)
-          local return_results = redis.call('zremrangebyscore', queue_key, min, max)
+          local return_results = redis.call('zrangebyscore', queue_key, min, max)
+          redis.call('zremrangebyscore', queue_key, min, max)
 
           return return_results
         EOS
@@ -167,8 +167,8 @@ module Rpush
           local queue_key = KEYS[1]
           local start = ARGV[1]
           local stop = ARGV[2]
-          redis.call('zrange', queue_key, start, stop)
-          local return_results = redis.call('zremrangebyrank', queue_key, start, stop)
+          local return_results = redis.call('zrange', queue_key, start, stop)
+          redis.call('zremrangebyrank', queue_key, start, stop)
 
           return return_results
         EOS
