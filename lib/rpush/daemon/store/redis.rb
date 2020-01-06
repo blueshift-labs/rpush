@@ -154,10 +154,12 @@ module Rpush
           keys = [key]
           args = [min, max]
           result = nil
-          begin
-            result = redis.evalsha(ZRANGEBYSCORETHENREM_SCRIPT_HASH, keys: keys, argv: args)
-          rescue ::Redis::CommandError => e
-            result = redis.eval(ZRANGEBYSCORETHENREM_SCRIPT, keys: keys, argv: args)
+          Modis.with_connection do |redis|
+            begin
+              result = redis.evalsha(ZRANGEBYSCORETHENREM_SCRIPT_HASH, keys: keys, argv: args)
+             rescue ::Redis::CommandError => e
+                result = redis.eval(ZRANGEBYSCORETHENREM_SCRIPT, keys: keys, argv: args)
+            end
           end
           result
         end
@@ -179,10 +181,13 @@ module Rpush
           keys = [key]
           args = [start, stop]
           result = nil
-          begin
-            result = redis.evalsha(ZRANGETHENREM_SCRIPT_HASH, keys: keys, argv: args)
-          rescue ::Redis::CommandError => e
-            result = redis.eval(ZRANGETHENREM_SCRIPT, keys: keys, argv: args)
+
+          Modis.with_connection do |redis|
+             begin
+              result = redis.evalsha(ZRANGETHENREM_SCRIPT_HASH, keys: keys, argv: args)
+            rescue ::Redis::CommandError => e
+              result = redis.eval(ZRANGETHENREM_SCRIPT, keys: keys, argv: args)
+            end
           end
           result
         end
