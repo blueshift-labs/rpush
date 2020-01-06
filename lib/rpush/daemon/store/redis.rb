@@ -156,7 +156,7 @@ module Rpush
           result = nil
           begin
             result = redis.evalsha(ZRANGEBYSCORETHENREM_SCRIPT_HASH, keys: keys, argv: args)
-          rescue Redis::CommandError => e
+          rescue ::Redis::CommandError => e
             result = redis.eval(ZRANGEBYSCORETHENREM_SCRIPT, keys: keys, argv: args)
           end
           result
@@ -181,7 +181,7 @@ module Rpush
           result = nil
           begin
             result = redis.evalsha(ZRANGETHENREM_SCRIPT_HASH, keys: keys, argv: args)
-          rescue Redis::CommandError => e
+          rescue ::Redis::CommandError => e
             result = redis.eval(ZRANGETHENREM_SCRIPT, keys: keys, argv: args)
           end
           result
