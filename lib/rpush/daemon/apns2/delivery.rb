@@ -107,7 +107,11 @@ module Rpush
         end
 
         def prepare_headers(notification)
-          notification_data(notification)[HTTP2_HEADERS_KEY] || {}
+          headers = notification_data(notification)[HTTP2_HEADERS_KEY] || {}
+          if headers['apns-topic'].blank? && @app.bundle_id.present?
+            headers['apns-topic'] = @app.bundle_id
+          end
+          headers
         end
 
         def notification_data(notification)
